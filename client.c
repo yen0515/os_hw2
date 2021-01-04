@@ -17,18 +17,21 @@ int main()
     
     key = SHM_KEY;
     
-    if( ( shmid = shmget( key, SHM_SIZE, IPC_CREAT | 0666 ) ) < 0 )
+    if( ( shmid = shmget( key, SHM_SIZE, IPC_CREAT | 0666 )) < 0 )
     {
         perror( "shmget" );
         exit(1);
     }
     
-    if( ( shm = shmat( shmid, NULL, 0 ) ) == (char *)-1 )
+    if( ( shm = shmat( shmid, NULL, 0 )) == (char *) - 1 )
     {
         perror( "shmat" );
         exit(1);
     }
-    
+
+    memset(shm, 0, ( SHM_SIZE - 1 ));
+    printf("\033[1;32m[client] The value is %d\033[0m\n", *shm);
+
     while(1)
     {
         int cmd;
@@ -43,7 +46,7 @@ int main()
             printf("\033[1;32m[client] The value is %d\033[0m\n", *shm);
         else if (cmd == 2) {
             printf("Input new value: ");
-            memset( ptr, 0, ( SHM_SIZE - 1 ) );
+            memset( ptr, 0, ( SHM_SIZE - 1 ));
             scanf("%d", ptr);
             memcpy(shm, ptr, ( SHM_SIZE - 1 ));
         }
