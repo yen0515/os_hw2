@@ -1,7 +1,7 @@
 CC = gcc
 PWD := $(shell pwd) 
 KVERSION := $(shell uname -r)
-KERNEL_DIR   = /usr/src/linux-headers-$(KVERSION)/
+KERNEL_DIR   = /usr/src/linux-headers-5.4.0-58-generic
 MODULE_NAME = page_table_driver
 obj-m := $(MODULE_NAME).o
 EXE = page_table server client

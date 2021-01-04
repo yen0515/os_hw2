@@ -59,11 +59,76 @@ int main()
 	printf("x : %s\n", x);
 	printf("y : %s\n", y);
 
-	/* TODO 1 */
-	// ------------------------------------------------
-	// Modify page table entry of y
-	// Let y point to x's physical address
-	// ------------------------------------------------
+	uint64_t x_addr = &x;
+	uint64_t y_addr = &y;
+	uint64_t cr3 = get_cr3_value();
+
+	uint64_t x_pml4 = (x_addr >> 39)*8;
+	x_addr -= x_addr >> 39 << 39;
+
+	uint64_t x_pdpt_addr = read_physical_address(cr3 + x_pml4);
+	x_pdpt_addr = x_pdpt_addr >> 12;
+	x_pdpt_addr = x_pdpt_addr << 12;
+	x_pdpt_addr = x_pdpt_addr << 28;
+	x_pdpt_addr = x_pdpt_addr >> 28;
+	uint64_t x_pdpt = (x_addr >> 30)*8;
+	x_addr -= x_addr >> 30 << 30;
+
+	uint64_t x_pd_addr = read_physical_address(x_pdpt_addr + x_pdpt);
+	x_pd_addr = x_pd_addr >> 12;
+	x_pd_addr = x_pd_addr << 12;
+	uint64_t x_pd = (x_addr >> 21)*8;
+	x_addr -= x_addr >> 21 << 21;
+
+	uint64_t x_pt_addr = read_physical_address(x_pd_addr + x_pd);
+	x_pt_addr = x_pt_addr >> 12;
+	x_pt_addr = x_pt_addr << 12;
+	uint64_t x_pt = (x_addr >> 12)*8;
+	x_addr -= x_addr >> 12 << 12;
+
+	uint64_t x_offset_addr = read_physical_address(x_pt_addr + x_pt);
+	x_offset_addr = x_offset_addr >> 12;
+	x_offset_addr = x_offset_addr << 12;
+	x_offset_addr = x_offset_addr << 28;
+	x_offset_addr = x_offset_addr >> 28;
+	uint64_t x_offset = (x_addr);
+
+	uint64_t x_physical_addr = read_physical_address(x_offset_addr + x_offset);
+
+	//-------------------------------------------------------------------------------
+	uint64_t y_pml4 = (y_addr >> 39)*8;
+	y_addr -= y_addr >> 39 << 39;
+
+	uint64_t y_pdpt_addr = read_physical_address(cr3 + y_pml4);
+	y_pdpt_addr = y_pdpt_addr >> 12;
+	y_pdpt_addr = y_pdpt_addr << 12;
+	y_pdpt_addr = y_pdpt_addr << 28;
+	y_pdpt_addr = y_pdpt_addr >> 28;
+	uint64_t y_pdpt = (y_addr >> 30)*8;
+	y_addr -= y_addr >> 30 << 30;
+
+	uint64_t y_pd_addr = read_physical_address(y_pdpt_addr + y_pdpt);
+	y_pd_addr = y_pd_addr >> 12;
+	y_pd_addr = y_pd_addr << 12;
+	uint64_t y_pd = (y_addr >> 21)*8;
+	y_addr -= y_addr >> 21 << 21;
+
+	uint64_t y_pt_addr = read_physical_address(y_pd_addr + y_pd);
+	y_pt_addr = y_pt_addr >> 12;
+	y_pt_addr = y_pt_addr << 12;
+	uint64_t y_pt = (y_addr >> 12)*8;
+	y_addr -= y_addr >> 12 << 12;
+
+	uint64_t y_offset_addr = read_physical_address(y_pt_addr + y_pt);
+	y_offset_addr = y_offset_addr >> 12;
+	y_offset_addr = y_offset_addr << 12;
+	y_offset_addr = y_offset_addr << 28;
+	y_offset_addr = y_offset_addr >> 28;
+	uint64_t y_offset = (y_addr);
+
+	uint64_t y_physical_addr = read_physical_address(y_offset_addr + y_offset);
+	
+	write_physical_address(y_offset_addr + y_offset, x_physical_addr);
 
 	getchar();
 
@@ -78,12 +143,7 @@ int main()
 	printf("x : %s\n", x);
 	printf("y : %s\n", y);
 
-	/* TODO 2 */
-	// ------------------------------------------------
-	// Recover page table entry of y
-	// Let y point to its original address
-	// You may need to store y's original address at previous step
-	// ------------------------------------------------
+	write_physical_address(y_offset_addr + y_offset, y_physical_addr);
 
 	getchar();
 
